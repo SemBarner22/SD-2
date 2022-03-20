@@ -32,12 +32,11 @@ class MongoReactiveDatabase {
         .singleOrDefault(null)
         .flatMap { gotParameter ->
             when (gotParameter) {
-                null -> {
-                    collection
-                        .insertOne(doc)
-                        .asObservable()
-                        .isEmpty
-                        .map { !it }
+                null -> { collection
+                    .insertOne(doc)
+                    .asObservable()
+                    .isEmpty
+                    .map { !it }
                 }
                 else -> Observable.just(false)
             }
