@@ -56,7 +56,6 @@ class MongoReactiveDatabase {
                 item
             }
         }
-    }
 
     private fun getCurrency(doc: Document): Currency = Currency.valueOf(doc.getString("currency"))
 }
