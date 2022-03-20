@@ -3,11 +3,11 @@ package server
 import com.mongodb.rx.client.MongoCollection
 import com.mongodb.client.model.Filters
 import com.mongodb.rx.client.MongoClients
-import data.Currency
 import data.Item
 import data.User
 import org.bson.Document
 import rx.Observable
+import utils.ParameterUtils.getCurrency
 
 class MongoReactiveDatabase {
 
@@ -55,6 +55,4 @@ class MongoReactiveDatabase {
                 item
             }
         }
-
-    private fun getCurrency(doc: Document): Currency = Currency.valueOf(doc.getString("currency"))
 }

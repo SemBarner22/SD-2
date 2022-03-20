@@ -1,6 +1,7 @@
 package data
 
 import org.bson.Document
+import utils.ParameterUtils
 
 class Item(
     private val id: Int,
@@ -13,7 +14,7 @@ class Item(
         doc.getInteger("id"),
         doc.getString("name"),
         doc.getDouble("price"),
-        Currency.valueOf(doc.getString("currency"))
+        ParameterUtils.getCurrency(doc)
     )
 
     override fun toDocument(): Document {

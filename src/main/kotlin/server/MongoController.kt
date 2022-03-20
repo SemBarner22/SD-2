@@ -1,12 +1,12 @@
 package server
 
 import io.netty.handler.codec.http.HttpResponseStatus
-import data.Currency
 import data.Item
 import data.User
 import exceptions.NoIdException
-import exceptions.NoSuchParameter
 import rx.Observable
+import utils.ParameterUtils.getCurrency
+import utils.ParameterUtils.getParameterByName
 
 class MongoController(private val mongoReactiveDatabase: MongoReactiveDatabase) {
 
@@ -17,37 +17,27 @@ class MongoController(private val mongoReactiveDatabase: MongoReactiveDatabase) 
         else -> Response(HttpResponseStatus.BAD_REQUEST, Observable.just("Did not find such page!"))
     }
 
-    private fun get(name: String, value: Map<String, List<String>>): String {
-        return (value[name] ?: throw NoSuchParameter("No such parameter"))[0]
-    }
-
     private fun getItems(value: Map<String, List<String>>): Response =
-        createOkResponse(mongoReactiveDatabase.itemsByUserId(get("id", value).toInt()).map { toString() })
+        createOkResponse(mongoReactiveDatabase.itemsByUserId(getParameterByName("id", value).toInt()).map { toString() })
 
-    private fun addUser(value: Map<String, List<String>>): Response {
-        val user = User(
-            get("id", value).toIntOrNull() ?: throw NoIdException("Add parameter id to User!"),
-            get("name", value),
-            getCurrency(value)
-        )
-        return createOkResponse( mongoReactiveDatabase.user(
-            user
+    private fun addUser(value: Map<String, List<String>>): Response = createOkResponse(
+        mongoReactiveDatabase.user(
+            User(
+                getParameterByName("id", value).toIntOrNull() ?: throw NoIdException("Add parameter id to User!"),
+                getParameterByName("name", value),
+                getCurrency(value)
+            )
         ).map { toString() })
-    }
 
-    private fun addItem(value: Map<String, List<String>>): Response {
-        val item = Item(
-            get("id", value).toIntOrNull() ?: throw NoIdException("Add parameter id to Item!"),
-            get("name", value),
-            get("price", value).toDouble(),
-            getCurrency(value)
-        )
-        return createOkResponse(mongoReactiveDatabase.item(
-            item
+    private fun addItem(value: Map<String, List<String>>): Response =
+        createOkResponse(mongoReactiveDatabase.item(
+            Item(
+                getParameterByName("id", value).toIntOrNull() ?: throw NoIdException("Add parameter id to Item!"),
+                getParameterByName("name", value),
+                getParameterByName("price", value).toDouble(),
+                getCurrency(value)
+            )
         ).map { toString() })
-    }
-
-    private fun getCurrency(value: Map<String, List<String>>) = Currency.valueOf(get("currency", value))
 
     private fun createOkResponse(message: Observable<String>) = Response(HttpResponseStatus.OK, message)
     companion object {
